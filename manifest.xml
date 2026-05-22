@@ -12,12 +12,12 @@
   <DisplayName DefaultValue="E-Mail Bewerter"/>
   <Description DefaultValue="Bewertet E-Mails automatisch nach deinen Kriterien mit KI"/>
 
-  <IconUrl DefaultValue="https://DEIN-USERNAME.github.io/outlook-email-bewerter/icon-64.png"/>
+  <IconUrl DefaultValue="https://ChrisZE1.github.io/outlook-email-bewerter/icon-64.png"/>
   <HighResolutionIconUrl DefaultValue="https://DEIN-USERNAME.github.io/outlook-email-bewerter/icon-128.png"/>
-  <SupportUrl DefaultValue="https://DEIN-USERNAME.github.io/outlook-email-bewerter/"/>
+  <SupportUrl DefaultValue="https://ChrisZE1.github.io/outlook-email-bewerter/"/>
 
   <AppDomains>
-    <AppDomain>https://DEIN-USERNAME.github.io</AppDomain>
+    <AppDomain>https://ChrisZE1.github.io</AppDomain>
   </AppDomains>
 
   <Hosts>
@@ -33,7 +33,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://DEIN-USERNAME.github.io/outlook-email-bewerter/taskpane.html"/>
+        <SourceLocation DefaultValue="https://ChrisZE1.github.io/outlook-email-bewerter/taskpane.html"/>
         <RequestedHeight>450</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -83,13 +83,13 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://DEIN-USERNAME.github.io/outlook-email-bewerter/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://DEIN-USERNAME.github.io/outlook-email-bewerter/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://DEIN-USERNAME.github.io/outlook-email-bewerter/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://ChrisZE1.github.io/outlook-email-bewerter/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://ChrisZE1.github.io/outlook-email-bewerter/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://ChrisZE1.github.io/outlook-email-bewerter/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://DEIN-USERNAME.github.io/outlook-email-bewerter/commands.html"/>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://DEIN-USERNAME.github.io/outlook-email-bewerter/taskpane.html"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://ChrisZE1.github.io/outlook-email-bewerter/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://ChrisZE1.github.io/outlook-email-bewerter/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel" DefaultValue="KI-Bewertung"/>
