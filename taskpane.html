@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Mail Bewerter</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: #1a1a1a; background: #fff; padding: 12px 14px 20px; }
+
+  h1 { font-size: 16px; font-weight: 600; margin-bottom: 2px; color: #1a1a1a; }
+  .subtitle { font-size: 12px; color: #666; margin-bottom: 14px; }
+
+  .section-title { font-size: 12px; font-weight: 600; color: #444; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+  .criteria-section { background: #f8f8f6; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
+  .criteria-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+  .criteria-toggle span { font-size: 12px; font-weight: 600; color: #444; text-transform: uppercase; letter-spacing: 0.4px; }
+  .criteria-toggle .arrow { font-size: 10px; color: #999; transition: transform 0.2s; }
+  .criteria-toggle.open .arrow { transform: rotate(180deg); }
+  .criteria-body { display: none; margin-top: 10px; }
+  .criteria-body.open { display: block; }
+
+  .crit-group { margin-bottom: 10px; }
+  .crit-label { font-size: 11px; color: #666; margin-bottom: 5px; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 12px; }
+  .tag-good { background: #e6f4d7; color: #2d6a0a; border: 0.5px solid #97c459; }
+  .tag-bad  { background: #fde8e8; color: #9b2828; border: 0.5px solid #f09595; }
+  .tag button { background: none; border: none; cursor: pointer; font-size: 13px; line-height: 1; color: inherit; padding: 0; margin-left: 2px; }
+  .add-row { display: flex; gap: 5px; }
+  .add-row input { flex: 1; font-size: 12px; padding: 5px 8px; border: 0.5px solid #ddd; border-radius: 6px; outline: none; }
+  .add-row input:focus { border-color: #999; }
+  .btn-add { font-size: 12px; padding: 5px 10px; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+  .btn-add-good { background: #e6f4d7; color: #2d6a0a; border: 0.5px solid #97c459; }
+  .btn-add-bad  { background: #fde8e8; color: #9b2828; border: 0.5px solid #f09595; }
+
+  .email-info { background: #f0f4ff; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; border-left: 3px solid #4a7cf7; }
+  .email-from { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .email-subject { font-size: 12px; color: #555; }
+  .email-none { font-size: 13px; color: #888; font-style: italic; }
+
+  .btn-evaluate { width: 100%; padding: 10px; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
+  .btn-evaluate:hover { background: #333; }
+  .btn-evaluate:disabled { background: #aaa; cursor: not-allowed; }
+
+  .result-card { border-radius: 10px; padding: 12px 14px; border: 0.5px solid #e0e0e0; }
+  .result-card.top { border-left: 4px solid #639922; }
+  .result-card.mid { border-left: 4px solid #EF9F27; }
+  .result-card.low { border-left: 4px solid #E24B4A; }
+
+  .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .result-name { font-size: 14px; font-weight: 600; }
+  .score-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .score-top { background: #e6f4d7; color: #2d6a0a; }
+  .score-mid { background: #fef3da; color: #7a4a00; }
+  .score-low { background: #fde8e8; color: #9b2828; }
+
+  .result-reason { font-size: 13px; color: #444; line-height: 1.5; margin-bottom: 8px; }
+  .hits { display: flex; flex-wrap: wrap; gap: 4px; }
+  .hit-good { background: #e6f4d7; color: #2d6a0a; font-size: 11px; padding: 2px 7px; border-radius: 999px; }
+  .hit-bad  { background: #fde8e8; color: #9b2828; font-size: 11px; padding: 2px 7px; border-radius: 999px; }
+
+  .loading { text-align: center; padding: 20px 0; }
+  .spinner { width: 28px; height: 28px; border: 3px solid #eee; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading p { font-size: 13px; color: #666; }
+
+  .history-section { margin-top: 14px; }
+  .history-title { font-size: 12px; font-weight: 600; color: #444; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .btn-clear { font-size: 11px; color: #999; background: none; border: none; cursor: pointer; text-decoration: underline; }
+  .history-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid #f0f0f0; }
+  .history-item:last-child { border-bottom: none; }
+  .history-from { font-size: 13px; color: #333; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
+  .history-score { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; flex-shrink: 0; }
+  .empty-state { font-size: 13px; color: #aaa; text-align: center; padding: 16px 0; font-style: italic; }
+</style>
+</head>
+<body>
+<h1>📬 E-Mail Bewerter</h1>
+<p class="subtitle">KI bewertet die aktuelle E-Mail nach deinen Kriterien</p>
+
+<div class="criteria-section">
+  <div class="criteria-toggle" id="criteria-toggle" onclick="toggleCriteria()">
+    <span>Kriterien</span>
+    <span class="arrow">▼</span>
+  </div>
+  <div class="criteria-body" id="criteria-body">
+    <div class="crit-group">
+      <div class="crit-label">✅ Positiv</div>
+      <div class="tag-row" id="good-tags"></div>
+      <div class="add-row">
+        <input type="text" id="good-input" placeholder="z.B. festes Einkommen…"/>
+        <button class="btn-add btn-add-good" onclick="addCriteria('good')">+ Gut</button>
+      </div>
+    </div>
+    <div class="crit-group" style="margin-top:10px">
+      <div class="crit-label">❌ Negativ</div>
+      <div class="tag-row" id="bad-tags"></div>
+      <div class="add-row">
+        <input type="text" id="bad-input" placeholder="z.B. Haustiere…"/>
+        <button class="btn-add btn-add-bad" onclick="addCriteria('bad')">+ Schlecht</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="email-info" id="email-info">
+  <div class="email-none">Keine E-Mail ausgewählt</div>
+</div>
+
+<button class="btn-evaluate" id="eval-btn" onclick="evaluate()" disabled>E-Mail jetzt bewerten</button>
+
+<div id="result-area"></div>
+
+<div class="history-section" id="history-section" style="display:none">
+  <div class="history-title">
+    Verlauf
+    <button class="btn-clear" onclick="clearHistory()">Löschen</button>
+  </div>
+  <div id="history-list"></div>
+</div>
+
+<script>
+let goodCriteria = JSON.parse(localStorage.getItem('good') || '["festes Einkommen","keine Haustiere","berufstätig","Referenzen vorhanden"]');
+let badCriteria  = JSON.parse(localStorage.getItem('bad')  || '["Haustiere","keine Berufsangabe","WG-Suche"]');
+let history = JSON.parse(localStorage.getItem('history') || '[]');
+let currentEmail = null;
+
+function saveCriteria() {
+  localStorage.setItem('good', JSON.stringify(goodCriteria));
+  localStorage.setItem('bad',  JSON.stringify(badCriteria));
+}
+
+function renderTags() {
+  document.getElementById('good-tags').innerHTML = goodCriteria.map((c,i)=>
+    `<span class="tag tag-good">${c}<button onclick="removeCriteria('good',${i})">×</button></span>`).join('');
+  document.getElementById('bad-tags').innerHTML = badCriteria.map((c,i)=>
+    `<span class="tag tag-bad">${c}<button onclick="removeCriteria('bad',${i})">×</button></span>`).join('');
+}
+
+function addCriteria(type) {
+  const inp = document.getElementById(type+'-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  if (type==='good') goodCriteria.push(val); else badCriteria.push(val);
+  inp.value='';
+  saveCriteria(); renderTags();
+}
+
+function removeCriteria(type,i) {
+  if (type==='good') goodCriteria.splice(i,1); else badCriteria.splice(i,1);
+  saveCriteria(); renderTags();
+}
+
+document.getElementById('good-input').addEventListener('keydown', e=>{ if(e.key==='Enter') addCriteria('good'); });
+document.getElementById('bad-input').addEventListener('keydown',  e=>{ if(e.key==='Enter') addCriteria('bad'); });
+
+function toggleCriteria() {
+  const body = document.getElementById('criteria-body');
+  const toggle = document.getElementById('criteria-toggle');
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+function renderHistory() {
+  const sec = document.getElementById('history-section');
+  const list = document.getElementById('history-list');
+  if (!history.length) { sec.style.display='none'; return; }
+  sec.style.display='block';
+  list.innerHTML = history.slice().reverse().map(h=>{
+    const cls = h.tier==='top'?'score-top':h.tier==='mid'?'score-mid':'score-low';
+    return `<div class="history-item">
+      <span class="history-from">${h.from}</span>
+      <span class="history-score ${cls}">${h.score}/10</span>
+    </div>`;
+  }).join('');
+}
+
+function clearHistory() {
+  history=[]; localStorage.removeItem('history'); renderHistory();
+}
+
+Office.onReady((info) => {
+  if (info.host === Office.HostType.Outlook) {
+    loadCurrentEmail();
+    Office.context.mailbox.addHandlerAsync(Office.EventType.ItemChanged, loadCurrentEmail);
+  }
+});
+
+function loadCurrentEmail() {
+  const item = Office.context.mailbox.item;
+  if (!item) {
+    document.getElementById('email-info').innerHTML = '<div class="email-none">Keine E-Mail ausgewählt</div>';
+    document.getElementById('eval-btn').disabled = true;
+    currentEmail = null;
+    return;
+  }
+  item.body.getAsync(Office.CoercionType.Text, (result) => {
+    currentEmail = {
+      from: item.from ? item.from.displayName + ' <' + item.from.emailAddress + '>' : 'Unbekannt',
+      subject: item.subject || '(kein Betreff)',
+      body: result.value ? result.value.substring(0, 2000) : ''
+    };
+    document.getElementById('email-info').innerHTML = `
+      <div class="email-from">${currentEmail.from}</div>
+      <div class="email-subject">${currentEmail.subject}</div>`;
+    document.getElementById('eval-btn').disabled = false;
+    document.getElementById('result-area').innerHTML = '';
+  });
+}
+
+async function evaluate() {
+  if (!currentEmail) return;
+  const btn = document.getElementById('eval-btn');
+  btn.disabled = true;
+  document.getElementById('result-area').innerHTML = `<div class="loading"><div class="spinner"></div><p>KI analysiert…</p></div>`;
+
+  const prompt = `Bewerte diese E-Mail für einen Vermieter.
+
+Positive Kriterien: ${goodCriteria.join(', ')}
+Negative Kriterien: ${badCriteria.join(', ')}
+
+E-Mail:
+Von: ${currentEmail.from}
+Betreff: ${currentEmail.subject}
+Text: ${currentEmail.body}
+
+Antworte NUR mit einem JSON-Objekt (kein Markdown):
+{"score":8,"tier":"top","reason":"Kurze Begründung auf Deutsch","good_hits":["Kriterium"],"bad_hits":["Kriterium"]}
+
+tier ist "top" (7-10), "mid" (4-6) oder "low" (1-3).`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content.map(i=>i.text||'').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const r = JSON.parse(clean);
+
+    const scoreClass = r.tier==='top'?'score-top':r.tier==='mid'?'score-mid':'score-low';
+    const goodHits = (r.good_hits||[]).map(h=>`<span class="hit-good">✓ ${h}</span>`).join('');
+    const badHits  = (r.bad_hits||[]).map(h=>`<span class="hit-bad">✗ ${h}</span>`).join('');
+
+    document.getElementById('result-area').innerHTML = `
+      <div class="result-card ${r.tier}">
+        <div class="result-header">
+          <span class="result-name">${currentEmail.from.split('<')[0].trim()}</span>
+          <span class="score-badge ${scoreClass}">${r.score}/10</span>
+        </div>
+        <p class="result-reason">${r.reason}</p>
+        <div class="hits">${goodHits}${badHits}</div>
+      </div>`;
+
+    history.push({ from: currentEmail.from.split('<')[0].trim(), score: r.score, tier: r.tier });
+    if (history.length > 20) history.shift();
+    localStorage.setItem('history', JSON.stringify(history));
+    renderHistory();
+
+  } catch(err) {
+    document.getElementById('result-area').innerHTML = `<p style="color:#c00;font-size:13px">Fehler bei der Analyse. Bitte erneut versuchen.</p>`;
+  }
+  btn.disabled = false;
+}
+
+renderTags();
+renderHistory();
+</script>
+</body>
+</html>
